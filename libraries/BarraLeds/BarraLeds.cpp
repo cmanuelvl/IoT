@@ -3,6 +3,7 @@
 
 //Constructor
 BarraLeds::BarraLeds(int numLeds, int pins[]) {
+	my_toggle = true;
   my_numLeds = numLeds;
   for (int i = 0; i < my_numLeds; i++) {
 		my_pins[i] = pins[i];
@@ -34,4 +35,20 @@ void BarraLeds::ledOff(int index) {
   } else {
     Serial.println("Índice fuera de rango");
   }
+}
+
+//ledToggle
+void BarraLeds::ledToggle(int index) {
+	
+	digitalWrite(my_pins[index], my_toggle ? HIGH : LOW);
+	my_toggle = !my_toggle;
+}
+
+//barraLedOn
+void BarraLeds::barraLedOn(int nivel){
+	for(int i = 0; i < my_numLeds; i++)
+		ledOff(i);
+	
+	for(int i = 0; i <= nivel; i++)
+		ledOn(i);
 }
