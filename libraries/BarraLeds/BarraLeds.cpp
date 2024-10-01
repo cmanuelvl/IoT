@@ -2,7 +2,7 @@
 #include <Arduino.h>
 
 //Constructor
-BarraLeds::BarraLeds(int numLeds, int pins[]) {
+BarraLeds::BarraLeds(int pins[], int numLeds) {
 	my_toggle = true;
   my_numLeds = numLeds;
   for (int i = 0; i < my_numLeds; i++) {
@@ -44,11 +44,11 @@ void BarraLeds::ledToggle(int index) {
 	my_toggle = !my_toggle;
 }
 
-//barraLedOn
-void BarraLeds::barraLedOn(int nivel){
+//barraLedOn: encinde n leds de la barra de leds 
+void BarraLeds::barraLedOn(int n){
 	for(int i = 0; i < my_numLeds; i++)
 		ledOff(i);
 	
-	for(int i = 0; i <= nivel; i++)
+	for(int i = 0; i <= n; i++)
 		ledOn(i);
 }

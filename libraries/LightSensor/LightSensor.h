@@ -4,20 +4,18 @@
 class LightSensor {
 	public:
 		// Constructor
-		LightSensor(float vref, int bits, int pin);
+		LightSensor(int pin, float vref, int bits);
 
-		// Metodos
+		// Métodos
 		void initialize();
 		float getVoltage();
 		float getValue();
 		int getScaledValue();
 		
 	private:
-		// Variables privadas
-		int my_vref;					//tensión de referencia del ADC
-		int my_bits;
 		int my_pin;					//conexión del pin
-
+		int my_vref;				//tensión de referencia del ADC
+		int my_bits;				//bits de ADC
 };
 
 #endif

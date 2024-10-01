@@ -2,7 +2,7 @@
 #define HARDWARE_H
 
 #define LIGHT_SENSOR  2
-#define BUUZZER			  3
+#define BUZZER			  3
 #define BUTTON			  4
 #define LED_Y		      5
 #define LED_R			    6
