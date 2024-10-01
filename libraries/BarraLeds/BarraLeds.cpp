@@ -33,7 +33,7 @@ void BarraLeds::ledOff(int index) {
   if (index >= 0 && index < my_numLeds) {
     digitalWrite(my_pins[index], LOW);
   } else {
-    Serial.println("Índice fuera de rango");
+    Serial.println("Indice fuera de rango");
   }
 }
 
