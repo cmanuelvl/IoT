@@ -11,6 +11,12 @@
 // defines
 #define TMR_500ms 500
 #define TMR_400ms 400
+<<<<<<< HEAD
+=======
+#define TMR_10000ms 10000
+#define TMR_20000ms 20000
+#define UMBRAL 50
+>>>>>>> 3a18c365e66f216cab33cb2a1fff96cae959e6e8
 
 #define TMR_10s   10000
 #define TMR_20s   20000
@@ -35,6 +41,7 @@ Rgb         oRgb(rgbPins);
 
 TimerEvent tmrid_500ms;
 TimerEvent tmrid_400ms;
+<<<<<<< HEAD
 TimeOut tmrid_30s;
 TimeOut tmrid_20s;
 TimeOut tmrid_10s;
@@ -46,6 +53,10 @@ void tmr_Callback_400ms();
 void tmr_Callback_10s();
 void tmr_Callback_20s();
 void tmr_Callback_30s();
+=======
+TimerEvent tmrid_10000ms;
+TimerEvent tmrid_20000ms;
+>>>>>>> 3a18c365e66f216cab33cb2a1fff96cae959e6e8
 
 void setup() {
   // put your setup code here, to run once:
@@ -65,6 +76,7 @@ void loop() {
   TimeOut::handler();
   
   switch(estado){
+<<<<<<< HEAD
     case NORMAL: // Estado inicial, se realiza la medida de la luminancia cada 400 ms y se refleja en la barra 
 
       if(nivel >= UMBRAL){
@@ -94,13 +106,57 @@ void loop() {
 
     case WAIT: // Estado ALARMA encendida, se activa el altavoz porque se ha superado 20s por encima del UMBRAL, solo se puede apagar mediante el pulsador
       
+=======
+    case INICIAL: // Estado inicial, se realiza la medida de la luminancia cada 400 ms y se refleja en la barra 
+      light_measure();
+      
+      if(barra_value >= UMBRAL){
+        estado = UMBRAL;
+        tmrid_10000ms.set(TMR_10000ms, tmr_Callback_10000ms);// Lanzar un temporizador que cuente tiempo de 10s
+        tmrid_20000ms.set(TMR_20000ms, tmr_Callback_20000ms);// Lanzar un temporizador que cuente tiempo de 20s
+      }
+    break; 
+
+    case UMBRAL: // Estado UMBRAL superado, se empieza a contar el tiempo de exposicion, a la mitad del tiempo (20s/2) se enciende RGB
+       light_measure();
+       // Cuando se lleven 10s encender rgb, y cuando se lleven 20s pasamos al estado ALARMA enciendo el altavoz 
+       
+       
+       if (barra_value < UMBRAL){
+        estado = INICIAL;
+        // Borrar la temporizacion
+       }
+    break;
+
+    case ALARMA: // Estado ALARMA encendida, se activa el altavoz porque se ha superado 20s por encima del UMBRAL, solo se puede apagar mediante el pulsador
+      if (button.buttonRead() == 0){
+        estado = INICIO;
+      }
+>>>>>>> 3a18c365e66f216cab33cb2a1fff96cae959e6e8
     break;
   }
 }
 
+<<<<<<< HEAD
 void tmr_Callback_400ms(){
   nivel = oLight.getScaledValue();
   oBarra.barraLedOn(nivel);
+=======
+//void tmr_Callback_400ms(){
+//  barra_value = lightSensor.getScaledValue();
+//  barraLeds.barraLedOn(barra_value);
+//}
+
+void tmr_Callback_10000ms(){
+  // Encender RGB
+}
+
+void tmr_Callback_20000ms(){
+  // Encender altavoz
+  buzzer.buzzerOn(350);
+  delay(1000);
+  buzzer.buzzerOff();
+>>>>>>> 3a18c365e66f216cab33cb2a1fff96cae959e6e8
 }
 
 void tmr_Callback_500ms(){
