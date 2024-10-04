@@ -72,6 +72,7 @@ class ADXL335 {
   private:
     void pinsInit();
     float scale;
+	//float threshold = 0.5;  // Umbral para detectar cambios significativos en los valores de aceleración. Declarada en la funcion principal
   public:
     void begin();
     void getXYZ(int* x, int* y, int* z);
@@ -79,6 +80,7 @@ class ADXL335 {
     float getAccelerationX();
     float getAccelerationY();
     float getAccelerationZ();
+	bool isArmLifted(float ax, float ay, float az);
 };
 
 #endif
