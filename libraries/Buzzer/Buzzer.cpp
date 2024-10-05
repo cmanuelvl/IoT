@@ -9,20 +9,22 @@ Buzzer::Buzzer(int pin) {
 
 //Métodos
 
-// initialize: inicializa 
+// initialize:
 void Buzzer::initialize() {
 	pinMode(my_pin, OUTPUT);
 }
 
+// buzzerOn:
 void Buzzer::buzzerOn(int freqz){
 	tone(my_pin, freqz);
 }
 
+// buzzerOff:
 void Buzzer::buzzerOff(){
 	noTone(my_pin);
 }
 
-// buzzerToggle:
+// buzzerToggle: genera 2 tonos, usar timer 
 void Buzzer::buzzerToggle(int freqz1, int freqz2) {
 	tone(my_pin, my_toggle ? freqz1 : freqz2);
 	my_toggle = !my_toggle;

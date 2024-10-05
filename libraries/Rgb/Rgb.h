@@ -12,7 +12,6 @@ class Rgb {
 		
 	private:
 		int my_pins[3];					//conexionado de pines
-		
 };
 
 #endif

@@ -10,7 +10,7 @@ class LightSensor {
 		void initialize();
 		float getVoltage();
 		float getValue();
-		int getScaledValue();
+		float getPercent();
 		
 	private:
 		int my_pin;					//conexión del pin

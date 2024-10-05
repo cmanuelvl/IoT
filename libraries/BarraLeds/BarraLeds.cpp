@@ -12,7 +12,7 @@ BarraLeds::BarraLeds(int pins[], int numLeds) {
 
 //Metodos
 
-// initialize: inicializa los pines (OUTPUT) de la barra de led
+// initialize: inicializa los pines (OUTPUT) de la barra de leds
 void BarraLeds::initialize() {
   for (int i = 0; i < my_numLeds; i++) {
 		pinMode(my_pins[i], OUTPUT);
@@ -28,7 +28,7 @@ void BarraLeds::ledOn(int index) {
   }
 }
 
-// ledOff
+// ledOff:
 void BarraLeds::ledOff(int index) {
   if (index >= 0 && index < my_numLeds) {
     digitalWrite(my_pins[index], LOW);
@@ -37,9 +37,8 @@ void BarraLeds::ledOff(int index) {
   }
 }
 
-//ledToggle
+//ledToggle:
 void BarraLeds::ledToggle(int index) {
-	
 	digitalWrite(my_pins[index], my_toggle ? HIGH : LOW);
 	my_toggle = !my_toggle;
 }
@@ -49,6 +48,6 @@ void BarraLeds::barraLedOn(int n){
 	for(int i = 0; i < my_numLeds; i++)
 		ledOff(i);
 	
-	for(int i = 0; i <= n; i++)
+	for(int i = 0; i < n; i++)
 		ledOn(i);
 }

@@ -10,31 +10,29 @@ LightSensor::LightSensor(int pin, float vref, int bits) {
 
 //Métodos
 
-// initialize: inicializa 
+// initialize:
 void LightSensor::initialize() {
 	pinMode(my_pin, INPUT);
-	analogReference(DEFAULT);		// tension de referencia 
+	analogReference(DEFAULT);		// tension de referencia por defecto 
 	Serial.begin(9600);					// leer por terminal 
 }
 
 float LightSensor::getVoltage(){
-	int value;
+	int codigo;
 	float voltage;
 	
-	value = analogRead(my_pin);
-	Serial.print("value: "); Serial.println(value); // value solo de 0 a 20.
-	
-	voltage = value * my_vref / pow(2, my_bits);
-	Serial.print("voltage: "); Serial.println(voltage);
+	codigo = analogRead(my_pin);
+	voltage = (float) codigo * my_vref / pow(2, my_bits);
 	return voltage;
 }
 
-// getScaledValue: valor proporcional (0-5) a la intensidad de luz
-int LightSensor::getScaledValue(){
-	float voltage, value;
-	int scaledValue;
+// getPercent: valor escalado a la intensidad de luz 0-100
+float LightSensor::getPercent(){
+	float voltage;
+	float percent;
+	
 	voltage = getVoltage();
-	value = voltage * 6 / my_vref;
-	scaledValue = round(scaledValue);
-	return scaledValue;
+	percent = voltage * 100 / my_vref;
+
+	return percent;
 }

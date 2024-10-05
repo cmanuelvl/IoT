@@ -31,19 +31,54 @@
 #include <Arduino.h>
 #include "ADXL335.h"
 
-void ADXL335::pinsInit() {
-    pinMode(X_AXIS_PIN, INPUT);
-    pinMode(Y_AXIS_PIN, INPUT);
-    pinMode(Z_AXIS_PIN, INPUT);
+ADXL335::ADXL335(int pins[], float vref, int bits) {
+	for (int i = 0; i < 3; i++) {
+		my_pins[i] = pins[i];
+  }
+	my_vref = vref;
+	my_bits = bits;
+}
+
+void ADXL335::initialize() {
+   for (int i = 0; i < 3; i++) {
+		pinMode(my_pins[i], OUTPUT);
+  }
 }
 void ADXL335::begin() {
-    pinsInit();
     scale = (float)SENSITIVITY * ADC_AMPLITUDE / ADC_REF;
 }
+
 void ADXL335::getXYZ(int* x, int* y, int* z) {
     *x = analogRead(X_AXIS_PIN);
     *y = analogRead(Y_AXIS_PIN);
     *z = analogRead(Z_AXIS_PIN);
+}
+
+void ADXL335::getCalibration(int* x_off, int* y_off, int* z_off){
+	
+	int x_sum = 0;
+	int	y_sum = 0;
+	int z_sum = 0;
+	
+	for (int i = 0; i < 100; i++) {
+
+		getXYZ(&x_sum, &y_sum, &z_sum);
+		
+		x_sum += x_sum;
+    y_sum += y_sum;
+    z_sum += z_sum;
+		
+		osDelay(10);		
+	}
+	
+	*x_off = x_sum / 100;
+  *y_off = y_sum / 100;
+  *z_off = z_sum / 100;
+} 
+
+void ADXL355::getAngle(){
+	
+	
 }
 void ADXL335::getAcceleration(float* ax, float* ay, float* az) {
     int x, y, z;

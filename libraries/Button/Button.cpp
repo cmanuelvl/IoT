@@ -13,7 +13,7 @@ void Button::initialize() {
 	pinMode(my_pin, INPUT_PULLUP);			// INPUT_PULLDOWN no est adefinido en Arduino.h
 }
 
-// 1 pulsado 0 not pulado
+// 0 pulsado 1 not pulado (PULLUP)
 int Button::buttonRead(){
 	return digitalRead(my_pin);
 }
