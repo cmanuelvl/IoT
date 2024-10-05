@@ -117,3 +117,16 @@ float ADXL335::getAccelerationZ() {
     az = (zvoltage - ZERO_Z) / SENSITIVITY;
     return az;
 }
+// Función que detecta si el brazo ha sido levantado
+bool isArmLifted(float ax, float ay, float az) {
+  // Detecta el levantamiento si:
+  // 1. La aceleración en Z disminuye (brazo moviéndose de vertical a horizontal)
+  // 2. Aceleraciones significativas en X o Y (debido al cambio de orientación)
+  
+  // El brazo se levanta cuando la aceleración en Z disminuye significativamente y hay un cambio en X o Y
+  if (az < 0.5 && (abs(ax) > threshold || abs(ay) > threshold)) {
+    return true;
+  }
+  
+  return false;
+}

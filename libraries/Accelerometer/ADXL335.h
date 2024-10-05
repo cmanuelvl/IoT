@@ -54,11 +54,6 @@ class ADXL335 {
   float getAccelerationZ();
 	
   private:
-    void initialize();
-		int my_pins[3];
-    float my_scale;
-  public:
-    
 };
 
 #endif
