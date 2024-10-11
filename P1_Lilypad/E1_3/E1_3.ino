@@ -99,11 +99,7 @@ void loop() {
     case LOW_PWR: // Estado LOW_PWR, control del bajo consumo dependiendo del cabeceo y balanceo.
 
       Serial.println("WAIT");
-      // desactivar sensores
-      oRgb.rgbColor(0, 0, 0);
-      oBarra.barraLedOn(0);
-      oBuzzer.buzzerOff();
-      buzzerOn = false;
+      
       
       // modo bajo consumo 
       Serial.println("DORMIR ");
@@ -118,6 +114,7 @@ void loop() {
       if(x_roll == 0 && y_pitch == 0){
         estado = NORMAL;
         Serial.println("NORMAL");
+        tmrid_400ms.set(TMR_400ms, tmr_Callback_400ms);
       }
     break;
     
@@ -165,6 +162,17 @@ void loop() {
   if(x_roll != 0 || y_pitch != 0){
      estado = LOW_PWR;
      Serial.println("LOW_PWR");
+     
+     // desactivar sensores
+     oRgb.rgbColor(0, 0, 0);
+     oBarra.barraLedOn(0);
+     oBuzzer.buzzerOff();
+     buzzerOn = false;
+
+     tmrid_400ms.disable();
+     tmrid_500ms.disable();
+     tmrid_10s.cancel();
+     tmrid_20s.cancel();
   }
 }
 
