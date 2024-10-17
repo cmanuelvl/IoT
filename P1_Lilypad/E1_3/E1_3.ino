@@ -16,7 +16,7 @@
 #define TMR_10s   10000
 #define TMR_20s   20000
 #define TMR_30s   30000
-#define UMBRAL 90
+#define UMBRAL 50
 
 // constantes 
 const int ledPins[6] = {PIN_BG_LED0, PIN_BG_LED1, PIN_BG_LED2, PIN_BG_LED3, PIN_BG_LED4, PIN_BG_LED5};
@@ -54,6 +54,7 @@ void tmr_Callback_400ms();
 void tmr_Callback_10s();
 void tmr_Callback_20s();
 void tmr_Callback_30s();
+bool posicionOK();
 
 void setup() {
   // put your setup code here, to run once:
@@ -103,7 +104,7 @@ void loop() {
       
       // modo bajo consumo 
       Serial.println("DORMIR ");
-      //delay(1000);  //LowPower.powerDown(SLEEP_15MS, ADC_OFF, BOD_OFF); 
+      //delay(1000);  //LowPower.powerDown(SLEEP_15MS, ADC_OFF, BOD_OFF);
       LowPower.idle(SLEEP_1S, ADC_OFF, TIMER4_OFF, TIMER3_OFF, TIMER1_OFF, TIMER0_OFF, SPI_OFF, USART1_OFF, TWI_OFF, USB_OFF);
       Serial.println("DESPERTAR ");
       
@@ -111,7 +112,7 @@ void loop() {
       Serial.print("Ang: ("); Serial.print(x_roll); Serial.print(","); Serial.print(y_pitch); Serial.println(")");
 
       // consulta pulsera (roll, pitch)
-      if(x_roll == 0 && y_pitch == 0){
+      if(posicionOK()){
         estado = NORMAL;
         Serial.println("NORMAL");
         tmrid_400ms.set(TMR_400ms, tmr_Callback_400ms);
@@ -159,7 +160,7 @@ void loop() {
     break;
   }
   
-  if(x_roll != 0 || y_pitch != 0){
+  if(posicionOK() == false){
      estado = LOW_PWR;
      Serial.println("LOW_PWR");
      
@@ -181,6 +182,9 @@ void tmr_Callback_400ms(){
   numLeds = round(percent*6/100);
   oBarra.barraLedOn(numLeds);
   oAccel.getAngle(&ox, &oy, &oz, &x_roll, &y_pitch);  // Control para volver a estado LOW_PWR, si el brazo esta en otra posición
+  Serial.print("A: ");
+  Serial.print(x_roll); Serial.print(","); Serial.println(y_pitch);
+  
 }
 
 void tmr_Callback_500ms(){
@@ -217,4 +221,11 @@ void tmr_Callback_30s(){
   estado = NORMAL;
   Serial.println("NORMAL");
   tmrid_400ms.set(TMR_400ms, tmr_Callback_400ms);
+}
+
+bool posicionOK(){
+  if(x_roll == 0 && (( y_pitch >= -90 && y_pitch <=-60) || y_pitch == 0))
+    return true;
+  else
+    return false;
 }
