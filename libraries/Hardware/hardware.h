@@ -1,28 +1,18 @@
 #ifndef HARDWARE_H 
 #define HARDWARE_H
 
-#define NUM_BG_LEDS 6
-#define ADC_VREF 3.3
-#define ADC_BITS 10
 
-#define PIN_LIGHT_SENSOR  2
-#define PIN_BUZZER				3
-#define PIN_BUTTON				4
-#define PIN_LED_Y					5
-#define PIN_LED_R					6
-#define PIN_ADXL335_X	    7
-#define PIN_ADXL335_Y			8		
-#define	PIN_ADXL335_Z			9
-#define PIN_I2C_SCL				10
-#define PIN_I2C_SDA				11
-#define	PIN_RGB_R					12
-#define PIN_RGB_G					13  
-#define PIN_RGB_B					14
-#define PIN_BG_LED0		    15
-#define PIN_BG_LED1		    16
-#define PIN_BG_LED2		    17
-#define PIN_BG_LED3		    18
-#define PIN_BG_LED4		    19
-#define PIN_BG_LED5		    20
+#define GPIO_PIN_0 		0	//D3
+#define GPIO_PIN_1 		1	//TX
+#define GPIO_PIN_2 		2	//D4  LED_BLUE
+#define GPIO_PIN_3 		3	//RX
+#define GPIO_PIN_4 		4	//D2
+#define GPIO_PIN_5 		5	//D1
+#define GPIO_PIN_12 	12	//D6
+#define GPIO_PIN_13 	13	//D7
+#define GPIO_PIN_14 	14	//D5
+#define GPIO_PIN_15 	15	//D8
+#define GPIO_PIN_16 	16	//D0
+#define GPIO_PIN_ADC 	A0 	//
 
 #endif
