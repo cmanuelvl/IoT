@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Exposición Luminica</title>
+  <style>
+    /* Estilos para centrar el contenido */
+    body {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Exposición Luminica</h1>
+  </header>
+  <main>
+    <p>Exposición: <span id="exposicionValue"></span>%</p>
+    <p>Umbral establecido: <span id="umbralValue"></span></p> <form action="/establecer_umbral" method="POST">
+      <label for="umbral">Umbral:</label>
+      <input type="number" id="umbral" name="umbral" required min="0" max="100">
+      <button type="submit">Enviar</button>
+    </form>
+  </main>
+  <script>
+    // Función para obtener los datos de exposición del servidor
+    function getExposicionData() {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "readExposicion", true);  // Reemplazar con la URL correcta
+
+      xhr.onload = function() {
+        if (this.status === 200) {
+          document.getElementById("exposicionValue").innerHTML = this.responseText;
+        } else {
+          console.error("Error al obtener los datos:", this.statusText);
+        }
+      };
+
+      xhr.onerror = function() {
+        console.error("Error de red:", this.statusText);
+      };
+
+      xhr.send();
+    }
+
+    // Actualizar los datos de exposición cada segundo
+    setInterval(getExposicionData, 1000);
+
+    // Manejar la sumisión del formulario (implementar la lógica del servidor)
+    // ...
+  </script>
+</body>
+</html>
