@@ -20,13 +20,21 @@ TimeOut tmrid_9s;
 ESP8266WebServer server ( 80 );
 Buzzer oBuzzer(GPIO_PIN_5);
 
+
+
 int cnt = 0;
 int cntb;
+int umbralActual;
+
 String webPage;
 
 void tmr_Callback_1s ();
 void tmr_Callback_9s ();
 
+// Calback recibir solicitudes, respuesta ack 200ok + webPage 
+void handleRoot() {
+  server.send(200, "text/html", webPage);
+}
 
 //Callback para actualizar el valor de la exposición
 void handleExposicion() {
@@ -42,21 +50,23 @@ void handleExposicion() {
   // error
 }
 
-// Calback recibir solicitudes, respuesta ack 200ok + webPage 
-void handleRoot() {
-  if (server.method() == HTTP_POST) {
-    String postData = server.arg("umbral");
-    int newThreshold = postData.toInt(); // Convertir a entero
+void handleSetUmbral() {
+  // Obtener el valor del umbral desde la solicitud
+  String umbralValue = server.arg("umbral");
 
-    // Almacenar el nuevo umbral (ejemplo)
-    umbralActual = newThreshold;
+  // Convertir el valor a un entero o flotante (según sea necesario)
+  int umbralInt = umbralValue.toInt();
 
-    // Enviar una respuesta al cliente
-    server.send(200, "text/plain", "Umbral actualizado correctamente");
-  } else {
-    server.send(200, "text/html", webPage);
-  }
-  server.send(200, "text/html", webPage);
+  Serial.print ( "UMBRALLLLLL") ;
+  Serial.println (umbralInt);
+  
+  // Hacer algo con el valor del umbral, por ejemplo:
+  // - Guardar el valor en una variable global
+  // - Enviar el valor a otro dispositivo
+  // - Actualizar algún estado en el sistema
+
+  // Enviar una respuesta al cliente
+  server.send(200, "text/plane", webPage);
 }
   
 void setup() {
@@ -64,18 +74,21 @@ void setup() {
   Serial.begin ( 115200 );
   
   webPage = "<html><head><title>Exposicion Luminica</title><style>body {text-align: center;}</style></head>";
-  webPage += "<body><header><h1>Exposicion Luminica</h1></header><main><p>Exposicion: <span id=\"exposicionValue\"></span>%</p>";
-  webPage += "<p>Umbral establecido: <span id=\"umbralValue\"></span></p> <form action=\"/establecer_umbral\" method=\"POST\">";
-  webPage += "<label for=\"umbral\">Umbral:</label><input type=\"number\" id=\"umbral\" name=\"umbral\" required min=\"0\" max=\"100\">";
-  webPage += "<button type=\"submit\">Enviar</button></form></main><script>function getExposicionData(){const xhttp = new XMLHttpRequest();";
-  webPage += "xhttp.open(\"GET\", \"readExposicion\", true);xhttp.onload = function() {if (this.status === 200)";
-  webPage += "{document.getElementById(\"exposicionValue\").innerHTML = this.responseText;} else {";
-  webPage += "console.error(\"Error al obtener los datos:\", this.statusText);}};";
-  webPage += "xhttp.onerror = function() {console.error(\"Error de red:\", this.statusText);};";
-  webPage += "xhttp.send();}setInterval(getExposicionData, 1000);</script></body></html>";
+  webPage += "<body><h1>EXPOSICION LUMINICA</h1><p>Exposicion: <span id=\"exposicionValue\"></span>%</p>";
+  webPage += "<form><label for=\"umbral\">Umbral:</label>";
+  webPage += "<input type=\"number\" id=\"umbral\" name=\"umbral\" required min=\"0\" max=\"100\"><button type=\"submit\">Enviar</button></form>";
+  webPage += "<script>function getExposicionData() {fetch('/readExposicion').then(response => response.text()).then(data =>{";
+  webPage += "document.getElementById('exposicionValue').textContent = data;}).catch(error => {console.error('Error al obtener los datos:', error);});}";
+  webPage += "document.querySelector('form').addEventListener('submit', (event) => {event.preventDefault();";
+  webPage += "const umbral = document.getElementById('umbral').value;fetch('/setUmbral', {";
+  webPage += "method: 'POST',headers: {'Content-Type': 'application/x-www-form-urlencoded'},body: `umbral=${umbral}`})";
+  webPage += ".then(response => {if (response.ok) {console.log('Umbral establecido correctamente');";
+  webPage += "document.getElementById('umbralValue').textContent = umbral;} else {console.error('Error al establecer el umbral');}})";
+  webPage += ".catch(error => {console.error('Error al enviar el formulario:', error);});});";
+  webPage += "getExposicionData();setInterval(getExposicionData, 1000); </script></body></html>";
   
-   pinMode(GPIO_PIN_2, OUTPUT);
-   digitalWrite(GPIO_PIN_2, HIGH);
+  pinMode(GPIO_PIN_2, OUTPUT);
+  digitalWrite(GPIO_PIN_2, HIGH);
    
   // Inicializacion WIFI
   WiFi.begin (ssid, password);
@@ -98,6 +111,7 @@ void setup() {
     
   server.on("/", handleRoot);   // escuchando solicitud de pagina 
   server.on("/readExposicion", handleExposicion); // escuchando solicitud de nivel de exposicion 
+  server.on("/setUmbral", HTTP_POST, handleSetUmbral);
   server.begin();
 }
 
