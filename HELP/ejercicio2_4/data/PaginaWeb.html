@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WEARABLE HIOT</title>
+  <style>
+    body {
+      background-image: url('https://pymstatic.com/110684/conversions/mejores-frases-sol-wide.jpg');
+      background-size: cover; 
+      background-position: center; 
+      height: 100vh; 
+      margin: 0;
+	  justify-content: center;
+	  align-items: center;
+    }
+    .content {
+      background-color: rgba(255, 255, 255, 0.8); /* Fondo semitransparente para mejorar la legibilidad del contenido */
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+	<h1 style="text-align: center; font-family: 'Times New Roman', Times, serif;">CONTROLADOR DE EXPOSISCION SOLAR</h1>
+	<p style="text-align: center; font-size: 20px; font-family: 'Times New Roman', Times, serif;"> EXPOSICION: 
+		<input style= "font-size: 20px; font-family: 'Times New Roman', Times, serif; border-radius: 5px;" name="name" readonly="readonly" size="3" type="text" id = "valorSensor" />
+		%
+	</p>
+	<form action="/umbral" method="POST" style="text-align: center; font-size: 20px; font-family: 'Times New Roman', Times, serif;">UMBRAL:
+			<input style="text-align: center; font-size: 20px; font-family: 'Times New Roman', Times, serif; border-radius: 5px;" id = "Vumbral" size="5" name="Vumbral" value = "80" type="text" placeholder=""  /> 
+			<input style="text-align: center; font-size: 20px; font-family: 'Times New Roman', Times, serif; border-radius: 5px;" type="submit" value="Actualizar" />
+		
+	</form>
+	</br>
+	<form action="/alarma" method="POST" style="text-align: center; display:none" id = "botonAlarma">
+		<input style="text-align: center; background-color: #ff0000; font-size: 20px; color: #ffffff; border-radius: 5px; border: 2px solid #ff8888; font-family: 'Times New Roman', Times, serif;" type="submit" value="ALARMA" />
+	</form>
+	<script>
+		function actualizarValor() {
+			var xhttp = new XMLHttpRequest();
+
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					document.getElementById("valorSensor").value = this.responseText;
+					var umbral = parseInt(document.getElementById("Vumbral").value);
+					if(parseInt(this.responseText) > umbral){
+						document.getElementById("botonAlarma").style.display = "inline-flex";
+						
+					}else{
+						document.getElementById("botonAlarma").style.display = "none";
+					}
+				}
+			};
+			var esp8266IP = window.location.hostname;
+			xhttp.open("GET", "http://" + esp8266IP + "/actualizar", true);
+			xhttp.send();
+		}
+
+		actualizarValor();
+
+		setInterval(actualizarValor, 1000);
+	</script>
+</body>
+</html>

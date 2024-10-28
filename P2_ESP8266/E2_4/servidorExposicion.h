@@ -15,7 +15,10 @@
     <input type="number" id="umbral" name="umbral" required min="0" max="100">
     <button type="submit">Enviar</button>
   </form>
-
+  <div id="alarma">
+    <p><strong>Luminosidad alta!</strong></p>
+    <button id="activarAlarma">Activar Alarma</button>
+  </div>
   <script>
     // Función para obtener los datos de exposición del servidor (GET)
     function getExposicionData() {
@@ -67,6 +70,7 @@ webPage = "<html><head><title>Exposicion Luminica</title><style>body {text-align
   webPage += "<body><h1>EXPOSICION LUMINICA</h1><p>Exposicion: <span id=\"exposicionValue\"></span>%</p>";
   webPage += "<form><label for=\"umbral\">Umbral:</label>";
   webPage += "<input type=\"number\" id=\"umbral\" name=\"umbral\" required min=\"0\" max=\"100\"><button type=\"submit\">Enviar</button></form>";
+  webPage += "<div id=\"alarma\"><p><strong>Luminosidad alta!</strong></p><button id=\"activarAlarma\">Activar Alarma</button></div>";
   webPage += "<script>function getExposicionData() {fetch('/readExposicion').then(response => response.text()).then(data =>{";
   webPage += "document.getElementById('exposicionValue').textContent = data;}).catch(error => {console.error('Error al obtener los datos:', error);});}";
   webPage += "document.querySelector('form').addEventListener('submit', (event) => {event.preventDefault();";

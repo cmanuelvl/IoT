@@ -14,7 +14,6 @@ LightSensor::LightSensor(int pin, float vref, int bits) {
 void LightSensor::initialize() {
 	pinMode(my_pin, INPUT);
 	analogReference(DEFAULT);		// tension de referencia por defecto 
-	Serial.begin(9600);					// leer por terminal 
 }
 
 float LightSensor::getVoltage(){

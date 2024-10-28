@@ -4,79 +4,34 @@
 #include <WiFiUDP.h>
 #include <TimerEvent.h>
 #include <TimeOut.h>
-#include <Buzzer.h>
 #include "hardware.h"
+#include <LightSensor.h>
 
-// define
-#define TMR_1s   1000
-#define TMR_9s   9000
+//define
+//#define VREF 3.3
+#define ADC_BITS  10
+#define TMR_500ms 500
 
+//const
 const char *ssid = "iPhone de cm";
 const char *password = "lavacadicemuu";
 
-TimerEvent tmrid_1s;
-TimeOut tmrid_9s;
-
+//Objetos
 ESP8266WebServer server ( 80 );
-Buzzer oBuzzer(GPIO_PIN_5);
+LightSensor oLight(GPIO_PIN_ADC, 3.3, ADC_BITS);
+TimerEvent tmrid_500ms;
 
-
-
-int cnt = 0;
-int cntb;
-int umbralActual;
-
+int umbralActual, exposicionActual;
 String webPage;
-
-void tmr_Callback_1s ();
-void tmr_Callback_9s ();
-
-// Calback recibir solicitudes, respuesta ack 200ok + webPage 
-void handleRoot() {
-  server.send(200, "text/html", webPage);
-}
-
-//Callback para actualizar el valor de la exposición
-void handleExposicion() {
-  String exposicionValue = String(cntb);
-  
-  Serial.print ( "klk") ;
-  Serial.println ( "exposicionValue") ;
-  
-  server.send(200, "text/plane", exposicionValue);
-
-  //if (ok leer valor)
-  //else 
-  // error
-}
-
-void handleSetUmbral() {
-  // Obtener el valor del umbral desde la solicitud
-  String umbralValue = server.arg("umbral");
-
-  // Convertir el valor a un entero o flotante (según sea necesario)
-  int umbralInt = umbralValue.toInt();
-
-  Serial.print ( "UMBRALLLLLL") ;
-  Serial.println (umbralInt);
-  
-  // Hacer algo con el valor del umbral, por ejemplo:
-  // - Guardar el valor en una variable global
-  // - Enviar el valor a otro dispositivo
-  // - Actualizar algún estado en el sistema
-
-  // Enviar una respuesta al cliente
-  server.send(200, "text/plane", webPage);
-}
   
 void setup() {
-
   Serial.begin ( 115200 );
   
   webPage = "<html><head><title>Exposicion Luminica</title><style>body {text-align: center;}</style></head>";
   webPage += "<body><h1>EXPOSICION LUMINICA</h1><p>Exposicion: <span id=\"exposicionValue\"></span>%</p>";
   webPage += "<form><label for=\"umbral\">Umbral:</label>";
   webPage += "<input type=\"number\" id=\"umbral\" name=\"umbral\" required min=\"0\" max=\"100\"><button type=\"submit\">Enviar</button></form>";
+  webPage += "<div id=\"alarma\"><p><strong>Luminosidad alta!</strong></p><button id=\"activarAlarma\">Activar Alarma</button></div>";
   webPage += "<script>function getExposicionData() {fetch('/readExposicion').then(response => response.text()).then(data =>{";
   webPage += "document.getElementById('exposicionValue').textContent = data;}).catch(error => {console.error('Error al obtener los datos:', error);});}";
   webPage += "document.querySelector('form').addEventListener('submit', (event) => {event.preventDefault();";
@@ -87,61 +42,81 @@ void setup() {
   webPage += ".catch(error => {console.error('Error al enviar el formulario:', error);});});";
   webPage += "getExposicionData();setInterval(getExposicionData, 1000); </script></body></html>";
   
+  // Init
+  oLight.initialize();
   pinMode(GPIO_PIN_2, OUTPUT);
-  digitalWrite(GPIO_PIN_2, HIGH);
-   
-  // Inicializacion WIFI
+  umbralActual = 100;
+  
+  // Iniciando conexion WIFI
   WiFi.begin (ssid, password);
-  Serial.println ( "" );
+  
   while ( WiFi.status () != WL_CONNECTED ) {
     delay ( 500 );
     Serial.print ( "." );
+    digitalWrite(GPIO_PIN_2, !digitalRead(GPIO_PIN_2)); // Aviso LED
   }
+  
+  // Conexion WIFI realizada
   Serial.println ( "" );
   Serial.print ( "Connected to " ) ;
   Serial.println ( ssid );
   Serial.print ( "IP address: " ) ;
   Serial.println ( WiFi.localIP() ) ;
 
-  // Aviso de conexion
-  digitalWrite(GPIO_PIN_2, LOW);
-  tmrid_1s.set(TMR_1s, tmr_Callback_1s);
-  tmrid_9s.timeOut(TMR_9s, tmr_Callback_9s); 
-  oBuzzer.buzzerOn(350);
-    
+  // Servidor lanzado
+  server.begin();
   server.on("/", handleRoot);   // escuchando solicitud de pagina 
   server.on("/readExposicion", handleExposicion); // escuchando solicitud de nivel de exposicion 
-  server.on("/setUmbral", HTTP_POST, handleSetUmbral);
-  server.begin();
+  server.on("/setUmbral", HTTP_POST, handleUmbral);
+
+  digitalWrite(GPIO_PIN_2, LOW); // Aviso LED
 }
 
 void loop() {
   // put your main code here, to run repeatedly
-  tmrid_1s.update();
-  TimeOut::handler();
-  
   server.handleClient();
   
   if ( WL_CONNECTED != WiFi.status() ){
     Serial.print ( WiFi.status() ) ;
-    digitalWrite(GPIO_PIN_2, HIGH);
+    //digitalWrite(GPIO_PIN_2, HIGH);
   }
 }
 
-void tmr_Callback_1s (){
-  cnt = (cnt >= 2) ? 0 : cnt+1;
-  if (0 == cnt)
-    oBuzzer.buzzerOn(350);
-  else 
-    oBuzzer.buzzerOff();
-   cntb =rand()%101;
-   Serial.print ( "este" );
-   Serial.println ( cntb );
+// Calback recibir solicitudes, respuesta ack 200ok + webPage 
+void handleRoot() {
+  server.send(200, "text/html", webPage);
 }
 
-void tmr_Callback_9s (){
-  //tmrid_1s.disable();
-  tmrid_9s.cancel();
-  Serial.print ( "9s") ;
-  oBuzzer.buzzerOff();
+//Callback para actualizar el valor de la exposición
+void handleExposicion() {
+
+  //exposicionActual = (int)oLight.getPercent();
+  //String exposicionValue = String(exposicionActual);
+  String exposicionValue = String(rand()%101);
+  
+  Serial.print ("EXPOSICION:  ") ;
+  Serial.println (exposicionValue) ;
+  
+  server.send(200, "text/plane", exposicionValue);
+
+  //if (ok leer valor)
+  //else 
+  // error
+}
+
+void handleUmbral() {
+  
+  String umbralValue = server.arg("umbral");  // Obtener el valor del umbral desde la solicitud
+
+  int umbralActual = umbralValue.toInt();
+
+  Serial.print ("UMBRAL: ") ;
+  Serial.println (umbralActual);
+
+  if (exposicionActual > umbralActual){
+    // Habilitar Alarma
+    
+  } else {
+    server.send(200, "text/plane", webPage);
+  }
 }
