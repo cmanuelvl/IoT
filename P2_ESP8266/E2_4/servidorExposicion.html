@@ -15,6 +15,11 @@
     <input type="number" id="umbral" name="umbral" required min="0" max="100">
     <button type="submit">Enviar</button>
   </form>
+  <!-- Si el estado de display es none, no se muestra hasta que el valor de la luminosidad pase el umbral -->
+  <div id="alarma" style="display: none;">
+  <p><strong>Luminosidad alta!</strong></p>
+  <button id="activarAlarma" onclick="activarAlarma()">Activar Alarma</button>
+  </div>
 
   <script>
     // Función para obtener los datos de exposición del servidor (GET)
@@ -23,6 +28,17 @@
         .then(response => response.text())
         .then(data => {
           document.getElementById('exposicionValue').textContent = data;
+		  
+		  // Almacenar los valores de exposición y umbral para compararlos
+          let exposicion = parseInt(data, 10);
+          let umbral = parseInt(document.getElementById("umbral").value, 10) || 0;
+
+          // Verificar si la exposición supera el umbral establecido
+          if (exposicion > umbral) {
+            document.getElementById('alarma').style.display = 'block';
+          } else {
+            document.getElementById('alarma').style.display = 'none';
+          }
         })
         .catch(error => {
           console.error('Error al obtener los datos:', error);
@@ -63,12 +79,20 @@
 </body>
 </html>
 
-webPage = "<html><head><title>Exposicion Luminica</title><style>body {text-align: center;}</style></head>";
+  webPage = "<html><head><title>Exposicion Luminica</title><style>body {text-align: center;}</style></head>";
   webPage += "<body><h1>EXPOSICION LUMINICA</h1><p>Exposicion: <span id=\"exposicionValue\"></span>%</p>";
   webPage += "<form><label for=\"umbral\">Umbral:</label>";
   webPage += "<input type=\"number\" id=\"umbral\" name=\"umbral\" required min=\"0\" max=\"100\"><button type=\"submit\">Enviar</button></form>";
+  webPage += "<div id=\"alarma\" style=\"display: none;\">";
+  webPage += "<p><strong>Luminosidad alta!</strong></p>";
+  webPage += "<button id="activarAlarma" onclick="activarAlarma()">Activar Alarma</button></div>";
   webPage += "<script>function getExposicionData() {fetch('/readExposicion').then(response => response.text()).then(data =>{";
-  webPage += "document.getElementById('exposicionValue').textContent = data;}).catch(error => {console.error('Error al obtener los datos:', error);});}";
+  webPage += "document.getElementById('exposicionValue').textContent = data";
+  webPage += "let exposicion = parseInt(data, 10);";
+  webPage += "let umbral = parseInt(document.getElementById("umbral").value, 10) || 0;"
+  webPage += "if (exposicion > umbral) {document.getElementById(\"alarma\").style.display = \"block\";} else {";
+  webPage += "document.getElementById(\"alarma\").style.display = \"none\;}";
+  webPage += "}).catch(error => {console.error('Error al obtener los datos:', error);});}";
   webPage += "document.querySelector('form').addEventListener('submit', (event) => {event.preventDefault();";
   webPage += "const umbral = document.getElementById('umbral').value;fetch('/setUmbral', {";
   webPage += "method: 'POST',headers: {'Content-Type': 'application/x-www-form-urlencoded'},body: `umbral=${umbral}`})";
@@ -76,3 +100,48 @@ webPage = "<html><head><title>Exposicion Luminica</title><style>body {text-align
   webPage += "document.getElementById('umbralValue').textContent = umbral;} else {console.error('Error al establecer el umbral');}})";
   webPage += ".catch(error => {console.error('Error al enviar el formulario:', error);});});";
   webPage += "getExposicionData();setInterval(getExposicionData, 1000); </script></body></html>";
+  
+  webPage = "<html><head><title>Exposicion Luminica</title>"
+  webPage += "<style>body {text-align: center;}</style></head>"
+                 "<body><h1>EXPOSICION LUMINICA</h1>"
+                 "<p>Exposicion: <span id=\"exposicionValue\"></span>%</p>"
+                 "<form><label for=\"umbral\">Umbral:</label>"
+                 "<input type=\"number\" id=\"umbral\" name=\"umbral\" required min=\"0\" max=\"100\">"
+                 "<button type=\"submit\">Enviar</button></form>"
+                 "<div id=\"alarma\" style=\"display: none;\">"
+                 "<p><strong>Luminosidad alta!</strong></p>"
+                 "<button id=\"activarAlarma\" onclick=\"activarAlarma()\">Activar Alarma</button></div>"
+                 "<script>"
+                 "function getExposicionData() {"
+                 "fetch('/readExposicion').then(response => response.text()).then(data => {"
+                 "document.getElementById('exposicionValue').textContent = data;"
+                 "let exposicion = parseInt(data, 10);"
+                 "let umbral = parseInt(document.getElementById('umbral').value, 10) || 0;"
+                 "if (exposicion > umbral) {"
+                 "document.getElementById('alarma').style.display = 'block';"
+                 "} else {"
+                 "document.getElementById('alarma').style.display = 'none';"
+                 "}"
+                 "}).catch(error => {console.error('Error al obtener los datos:', error);});"
+                 "}"
+                 "document.querySelector('form').addEventListener('submit', (event) => {"
+                 "event.preventDefault();"
+                 "const umbral = document.getElementById('umbral').value;"
+                 "fetch('/setUmbral', {"
+                 "method: 'POST',"
+                 "headers: {'Content-Type': 'application/x-www-form-urlencoded'},"
+                 "body: `umbral=${umbral}`"
+                 "})"
+                 ".then(response => {"
+                 "if (response.ok) {"
+                 "console.log('Umbral establecido correctamente');"
+                 "document.getElementById('umbralValue').textContent = umbral;"
+                 "} else {"
+                 "console.error('Error al establecer el umbral');"
+                 "}"
+                 "})"
+                 ".catch(error => {console.error('Error al enviar el formulario:', error);});"
+                 "});"
+                 "getExposicionData();"
+                 "setInterval(getExposicionData, 1000);"
+                 "</script></body></html>";
