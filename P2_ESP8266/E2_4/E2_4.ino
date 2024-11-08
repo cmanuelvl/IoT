@@ -13,34 +13,67 @@
 #define TMR_500ms 500
 
 //const
-const char *ssid = "iPhone de cm";
-const char *password = "lavacadicemuu";
+const char *ssid = "MiFibra-VJZ";
+const char *password = "V51748155H";
 
 //Objetos
 ESP8266WebServer server ( 80 );
 LightSensor oLight(GPIO_PIN_ADC, 3.3, ADC_BITS);
 TimerEvent tmrid_500ms;
 
-int umbralActual, exposicionActual;
+int umbralActual = 100, exposicionActual;
 String webPage;
   
 void setup() {
   Serial.begin ( 115200 );
   
-  webPage = "<html><head><title>Exposicion Luminica</title><style>body {text-align: center;}</style></head>";
-  webPage += "<body><h1>EXPOSICION LUMINICA</h1><p>Exposicion: <span id=\"exposicionValue\"></span>%</p>";
-  webPage += "<form><label for=\"umbral\">Umbral:</label>";
-  webPage += "<input type=\"number\" id=\"umbral\" name=\"umbral\" required min=\"0\" max=\"100\"><button type=\"submit\">Enviar</button></form>";
-  webPage += "<div id=\"alarma\"><p><strong>Luminosidad alta!</strong></p><button id=\"activarAlarma\">Activar Alarma</button></div>";
-  webPage += "<script>function getExposicionData() {fetch('/readExposicion').then(response => response.text()).then(data =>{";
-  webPage += "document.getElementById('exposicionValue').textContent = data;}).catch(error => {console.error('Error al obtener los datos:', error);});}";
-  webPage += "document.querySelector('form').addEventListener('submit', (event) => {event.preventDefault();";
-  webPage += "const umbral = document.getElementById('umbral').value;fetch('/setUmbral', {";
-  webPage += "method: 'POST',headers: {'Content-Type': 'application/x-www-form-urlencoded'},body: `umbral=${umbral}`})";
-  webPage += ".then(response => {if (response.ok) {console.log('Umbral establecido correctamente');";
-  webPage += "document.getElementById('umbralValue').textContent = umbral;} else {console.error('Error al establecer el umbral');}})";
-  webPage += ".catch(error => {console.error('Error al enviar el formulario:', error);});});";
-  webPage += "getExposicionData();setInterval(getExposicionData, 1000); </script></body></html>";
+/***************************************************** WEBPAGE ******************************************************************************/
+webPage = "<html><head><title>Exposicion Luminica</title>"
+          "<style>body {text-align: center;}</style></head>"
+          "<body><h1>EXPOSICION LUMINICA</h1>"
+          "<p>Exposicion: <span id=\"exposicionValue\"></span>%</p>"
+          "<form><label for=\"umbral\">Umbral:</label>"
+          "<input type=\"number\" id=\"umbral\" name=\"umbral\" required min=\"0\" max=\"100\">"
+          "<button type=\"submit\">Enviar</button></form>"
+          "<div id=\"alarma\" style=\"display: none;\">"
+          "<p><strong>Luminosidad alta!</strong></p>"
+          "<button id=\"activarAlarma\" onclick=\"activarAlarma()\">Activar Alarma</button></div>"
+          "<script>"
+          "let umbral_ini = " + String(umbralActual) + "; "
+          "function getExposicionData() {"
+          "fetch('/readExposicion').then(response => response.text()).then(data => {"
+          "document.getElementById('exposicionValue').textContent = data;"
+          "let exposicion = parseInt(data, 10);"
+          "let umbral = parseInt(document.getElementById('umbral').value, 10) || umbral_ini;"
+          "if (exposicion > umbral) {"
+          "document.getElementById('alarma').style.display = 'block';"
+          "} else {"
+          "document.getElementById('alarma').style.display = 'none';"
+          "}"
+          "}).catch(error => {console.error('Error al obtener los datos:', error);});"
+          "}"
+          "document.querySelector('form').addEventListener('submit', (event) => {"
+          "event.preventDefault();"
+          "const umbral = document.getElementById('umbral').value;"
+          "fetch('/setUmbral', {"
+          "method: 'POST',"
+          "headers: {'Content-Type': 'application/x-www-form-urlencoded'},"
+          "body: `umbral=${umbral}`"
+          "})"
+          ".then(response => {"
+          "if (response.ok) {"
+          "console.log('Umbral establecido correctamente');"
+          "document.getElementById('umbralValue').textContent = umbral;"
+          "} else {"
+          "console.error('Error al establecer el umbral');"
+          "}"
+          "})"
+          ".catch(error => {console.error('Error al enviar el formulario:', error);});"
+          "});"
+          "getExposicionData();"
+          "setInterval(getExposicionData, 1000);"
+          "</script></body></html>";
+/********************************************************************************************************************************************/
   
   // Init
   oLight.initialize();
@@ -108,7 +141,7 @@ void handleUmbral() {
   
   String umbralValue = server.arg("umbral");  // Obtener el valor del umbral desde la solicitud
 
-  int umbralActual = umbralValue.toInt();
+  umbralActual = umbralValue.toInt();
 
   Serial.print ("UMBRAL: ") ;
   Serial.println (umbralActual);
