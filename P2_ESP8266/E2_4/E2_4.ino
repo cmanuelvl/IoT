@@ -136,7 +136,7 @@ void loop() {
   
   if ( WL_CONNECTED != WiFi.status() ){
     Serial.print ( WiFi.status() ) ;
-    //digitalWrite(GPIO_PIN_2, HIGH);
+    digitalWrite(GPIO_PIN_2, HIGH);
   }
 }
 
@@ -148,9 +148,9 @@ void handleRoot() {
 //Callback para actualizar el valor de la exposición
 void handleExposicion() {
 
-  //exposicionActual = (int)oLight.getPercent();
-  //String exposicionValue = String(exposicionActual);
-  String exposicionValue = String(rand()%101);
+  exposicionActual = (int)oLight.getPercent();
+  String exposicionValue = String(exposicionActual);
+  //String exposicionValue = String(rand()%101);
   
   Serial.print ("EXPOSICION:  ") ;
   Serial.println (exposicionValue) ;
