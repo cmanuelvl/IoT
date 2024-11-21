@@ -8,8 +8,8 @@
 #define TMR_1s   1000
 #define TMR_9s   9000
 
-const char *ssid = "iPhone de cm";
-const char *password = "lavacadicemuu";
+const char *ssid = "Juan Camilo <3";
+const char *password = "camiloooo";
 
 TimerEvent tmrid_1s;
 TimeOut tmrid_9s;
